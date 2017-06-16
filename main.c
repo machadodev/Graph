@@ -8,6 +8,8 @@
 /*
 	Cria um grafo
 */
+static int visit[1000],cnt;
+
 TG* create()
 {
 	TG * g = (TG*)malloc(sizeof(TG));
@@ -256,6 +258,25 @@ TViz *findEdge(TG *g, int id1, int id2)
 
 void removeEdge(TG *g, int id1, int id2, int orientado)
 {
+	
+    TNo *p = findVertex(g, id1);
+
+    TViz *v = p->prim_viz;
+    TViz *anterior;
+
+    while(v){
+        anterior=v;
+        if(v->id_viz==id2);
+        break;
+
+        v=v->prox_viz;
+    }
+    if(v){
+        anterior->prox_viz=v->prox_viz;
+        free(v);
+    }
+    if(!orientado)
+        removeEdge(g,id2,id1,1);
 }
 
 /* Exibe o grafo na tela */
@@ -428,6 +449,53 @@ void fortemente_conexos(TG *g)
 		printf("\tNenhum\n");
 }
 
+void caminho(TG *g,int id1){
+    visit[id1]=1;
+    TNo *p = findVertex(g, id1);
+    if(p) {
+        TViz *v=p->prim_viz;
+
+        while (v) {
+            if(visit[v->id_viz]==0)
+                caminho(g,v->id_viz);
+            v=v->prox_viz;
+        }
+    }
+}
+int encontraCaminho(TG *g, int id1, int id2){
+    TNo *p=g->prim_no;
+    cnt =0;
+    for (p; p!=NULL ; p=p->prox_no) {
+        cnt++;
+        visit[cnt]=0;
+    }
+    caminho(g,id1);
+    return visit[id2];
+
+
+}
+
+void achaPontes(TG *g){                     //METODO SIMPLES
+    TNo *p=g->prim_no;
+    int id1,id2;
+    while(p){
+        id1=p->id_no;
+        TViz *v=p->prim_viz;
+        while(v){
+            TViz *proximo =v->prox_viz;
+            id2=v->id_viz;
+            removeEdge(g,id1,id2,0);
+            if(encontraCaminho(g,id1,id2)){
+                if(id1<id2)
+                    printf("\n(%d,%d) e ponte", id1, id2);
+            }
+            insertEdge(g,id1,id2,0);
+            v=proximo;
+        }
+
+    }
+}
+
 
 int menu(TG *G)
 {
@@ -445,7 +513,8 @@ int menu(TG *G)
 		printf("6. Retirar Arco\n");
 		printf("7. Buscar Vertice\n");
 		printf("8. Buscar Arco\n");
-		printf("9. Sair\n");
+		printf("9. Exibe Pontes\n");
+        	printf("10. Sair\n");
 		printf("> ");
 
 		int option = 0;
@@ -503,7 +572,20 @@ int menu(TG *G)
 			break;
 
 			case 6:
-			break;
+			{
+                		int id1= 0;
+               			int id2= 0,orientado;
+                		printf("\nId1 do Arco: ");
+                		scanf("%d", &id1);
+                		printf("\nId2 do Arco: ");
+                		scanf("%d", &id2);
+                		printf("\ngrafo e orientado?: ");
+                		scanf("%d",&orientado);
+                		removeEdge(G,id1,id2,orientado);
+                		printf("\nremovido (%d,%d)",id1,id2);
+
+            		}
+                	break;
 
 			case 7:
 			{
@@ -549,8 +631,17 @@ int menu(TG *G)
 			break;
 
 			case 9:
-			return TRUE;
+				{
+                		printf("Pontes existentes no Grafo:");
 
+                		achaPontes(G);
+				}
+                		break;
+
+            		case 10:
+				
+                	return TRUE;
+				
 			default:
 			printf("Parametro invalido\n");
 		}
