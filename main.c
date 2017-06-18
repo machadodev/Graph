@@ -370,7 +370,7 @@ int insertVertex(TG *g, int id)
 	return TRUE;
 }
 
-/* Insere um vertice no grafo
+/* Remove um vertice no grafo
 
 	Return:
 	TRUE caso tenha removido com sucesso
@@ -828,10 +828,13 @@ int fortemente_conexos(TG *g)
 	/* Retorna 0 pois nenhuma outra função precisa ser chamada */
 	return 0;
 }
+/* Função Booleana */
 int conexo(TG* G)
 {
 	/* IMPLEMENTAÇÃO */
 }
+
+/* Função Booleana */
 int componentes_conexos(TG* G)
 {
 	/* IMPLEMENTAÇÃO */
