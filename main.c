@@ -555,7 +555,7 @@ TViz *findEdge(TG *g, int id1, int id2)
 	variável 'flag' recebe o valor TRUE caso algum arco tenha sido removido
 
 	Return:
-	Nova lista de adjacencias sem o vertice a ser removido
+	Nova lista de adjacencias sem o arco a ser removido
 	
 */
 TViz *_remove(TViz *vertex, int id, int *flag)
