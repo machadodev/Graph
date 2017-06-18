@@ -18,7 +18,8 @@ void push(TP *pilha, int val)
 
 	novaPilha->prox = NULL;
 
-	if(pilha->prox == NULL)pilha->prox = novaPilha;
+	if(pilha->prox == NULL)
+		pilha->prox = novaPilha;
 
 	else{
 
@@ -303,10 +304,11 @@ void achaArticulacao(TG *g)
 }
 
 /* Cria um grafo */
-TG* create()
+TG* create(int V)
 {
 	TG * g = (TG*)malloc(sizeof(TG));
 	g->prim_no = NULL;
+	g->V = V;
 
 	return g;
 }
@@ -318,7 +320,7 @@ void release(TG *g)
 	{
 		TNo *p = g->prim_no;
 
-		/* Libera os vÃ©rtices */
+		/* Libera os vértices */
 		while(p)
 		{
 			TViz *v = p->prim_viz;
@@ -343,11 +345,11 @@ void release(TG *g)
 }
 
 /* Encontra um vertice no grafo
-	
-	Return:
-	Retorna um ponteiro vÃ¡lido para o vertice caso exista
-	Caso nÃ£o exista, retorna NULL
- */
+
+Return:
+Retorna um ponteiro válido para o vertice caso exista
+Caso não exista, retorna NULL
+*/
 TNo *findVertex(TG *g, int id)
 {
 	TNo *p = g->prim_no;
@@ -363,15 +365,15 @@ TNo *findVertex(TG *g, int id)
 	return p;
 }
 
-/* Insere um vertice no grafo 
-	
-	Return:
-	TRUE caso seja inserido com sucesso
-	FALSE caso jÃ¡ exista esse vertice no grafo
+/* Insere um vertice no grafo
+
+Return:
+TRUE caso seja inserido com sucesso
+FALSE caso já exista esse vertice no grafo
 */
 int insertVertex(TG *g, int id)
 {
-	/* Verifica se o vÃ©rtice jÃ¡ existe no grafo. Se existir, nÃ£o inserir novamente */
+	/* Verifica se o vértice já existe no grafo. Se existir, não inserir novamente */
 	if(findVertex(g, id))
 		return FALSE;
 
@@ -393,14 +395,16 @@ int insertVertex(TG *g, int id)
 	else
 		g->prim_no = vertice;
 
+	g->V++;
+
 	return TRUE;
 }
 
 /* Remove um vertice no grafo
 
-	Return:
-	TRUE caso tenha removido com sucesso
-	FALSE caso o vertice nao exista no grafo
+Return:
+TRUE caso tenha removido com sucesso
+FALSE caso o vertice nao exista no grafo
 */
 int removeVertex(TG *g, int id)
 {
@@ -416,7 +420,7 @@ int removeVertex(TG *g, int id)
 		p = p->prox_no;
 	}
 
-	/* Se p Ã© NULL, nÃ£o existe o que ser retirado */
+	/* Se p é NULL, não existe o que ser retirado */
 	if(p)
 	{
 		/* Vamos excluir os caminhos de p para outro nos */
@@ -466,23 +470,24 @@ int removeVertex(TG *g, int id)
 
 			anterior = NULL;
 
-			q = q->prox_no;			//e agora olhamos se outro nÃ³ tem aresta para p
+			q = q->prox_no;			//e agora olhamos se outro nó tem aresta para p
 		}
 
 		//agora vamos enfim retirar o no
 		if(!anterior_no)
-		{		//se p Ã© o primeiro no do grafo
+		{		//se p é o primeiro no do grafo
 			g->prim_no = p->prox_no;	//o primeiro no do grafo passa a ser o proximo de p
 
 			free(p);
-
+			g->V--;
 			return TRUE;
 		}
 
-		anterior_no->prox_no = p->prox_no; //o no anterior a p aponta para o proximo no apÃ³s p
+		anterior_no->prox_no = p->prox_no; //o no anterior a p aponta para o proximo no após p
 
 		free(p);
 
+		g->V--;
 		return TRUE;
 	}
 
@@ -491,34 +496,34 @@ int removeVertex(TG *g, int id)
 
 /* Insere um arco no grafo
 
-	Return:
-	TRUE caso insira com sucesso o arco no grafo
-	FALSE caso os vertices id1 ou id2 nÃ£o existam no grafo
+Return:
+TRUE caso insira com sucesso o arco no grafo
+FALSE caso os vertices id1 ou id2 não existam no grafo
 */
 int insertEdge(TG *g, int id1, int id2, int orientado)
 {
-	//id1 Ã© origem, id2 Ã© destino 
+	//id1 é origem, id2 é destino 
 
 	TNo *p = g->prim_no;
 
 	while((p) && (p->id_no != id2))
-	{ //acha o nÃ³ de destino
+	{ //acha o nó de destino
 		p = p->prox_no;
 
 	}
 
 	if(!p)
-		return FALSE;  //se o no de destino nÃ£o existe, nÃ£o faz nada
+		return FALSE;  //se o no de destino não existe, não faz nada
 
 	p = g->prim_no;
 
 	while((p) && (p->id_no != id1))
-	{ //acha o nÃ³ de origem
+	{ //acha o nó de origem
 		p = p->prox_no;
 	}
 
 	if(!p)
-		return FALSE;  //se o no de origem nÃ£o existe, nÃ£o faz nada
+		return FALSE;  //se o no de origem não existe, não faz nada
 
 	TViz *novo = (TViz*)malloc(sizeof(TViz));
 	novo->id_viz = id2;
@@ -527,7 +532,7 @@ int insertEdge(TG *g, int id1, int id2, int orientado)
 	TViz *v = p->prim_viz;
 
 	if(!v)
-	{ 		//se nÃ£o tem primeiro vizinho, o novo Ã© o primeiro agora 
+	{ 		//se não tem primeiro vizinho, o novo é o primeiro agora 
 		p->prim_viz = novo;
 
 		if(!orientado)
@@ -539,8 +544,8 @@ int insertEdge(TG *g, int id1, int id2, int orientado)
 	while(v->prox_viz)
 	{
 		if(v->id_viz == id2)
-			return FALSE; //se o caminho ja existe, nÃ£o faz nada. 
-						  //se nÃ£o for orientado ja existe o caminho id2->id1 tambÃ©m
+			return FALSE; //se o caminho ja existe, não faz nada. 
+						  //se não for orientado ja existe o caminho id2->id1 também
 
 		v = v->prox_viz;  //acha o ultimo vizinho
 	}
@@ -548,16 +553,16 @@ int insertEdge(TG *g, int id1, int id2, int orientado)
 	v->prox_viz = novo;   //acrescenta o novo caminho no final da lista de vizinhos
 
 	if(!orientado)
-		insertEdge(g, id2, id1, 1); //se nÃ£o for orientado, faz o caminho id2->id1
+		insertEdge(g, id2, id1, 1); //se não for orientado, faz o caminho id2->id1
 
 	return TRUE;
 }
 
 /* Busca um arco no grafo
 
-	Return:
-	Um ponteiro vÃ¡lido para o arco caso seja encontrado
-	NULL caso o arco nÃ£o exista
+Return:
+Um ponteiro válido para o arco caso seja encontrado
+NULL caso o arco não exista
 */
 TViz *findEdge(TG *g, int id1, int id2)
 {
@@ -576,13 +581,13 @@ TViz *findEdge(TG *g, int id1, int id2)
 	return v;
 }
 
-/* Remover arco - FunÃ§Ã£o auxiliar
+/* Remover arco - Função auxiliar
 
-	variÃ¡vel 'flag' recebe o valor TRUE caso algum arco tenha sido removido
+variável 'flag' recebe o valor TRUE caso algum arco tenha sido removido
 
-	Return:
-	Nova lista de adjacencias sem o arco a ser removido
-	
+Return:
+Nova lista de adjacencias sem o arco a ser removido
+
 */
 TViz *_remove(TViz *vertex, int id, int *flag)
 {
@@ -608,9 +613,9 @@ TViz *_remove(TViz *vertex, int id, int *flag)
 
 /* Remover arco
 
-	Return:
-	TRUE caso tenha removido o arco com sucesso
-	FALSE caso o arco a ser removido nÃ£o exista
+Return:
+TRUE caso tenha removido o arco com sucesso
+FALSE caso o arco a ser removido não exista
 
 */
 int removeEdge(TG *G, int id1, int id2, int isDirected)
@@ -625,7 +630,7 @@ int removeEdge(TG *G, int id1, int id2, int isDirected)
 
 		if(flag)
 		{
-			/* Caso o grafo seja orientado, remover a volta tambÃ©m */
+			/* Caso o grafo seja orientado, remover a volta também */
 			if(isDirected)
 			{
 				return removeEdge(G, id2, id1, 0);
@@ -667,11 +672,11 @@ void print(TG *g)
 
 
 
-/*  Verifica se o grafo Ã© orientado ou nÃ£o.
+/*  Verifica se o grafo é orientado ou não.
 
-	Return:
-	TRUE caso o grafo seja orientado
-	FALSE caso nÃ£o seja
+Return:
+TRUE caso o grafo seja orientado
+FALSE caso não seja
 */
 
 int directed(TG *G)
@@ -747,14 +752,14 @@ int sair_chegar(TG *g, int id1, int id2, int caminho)
 		//printf("testando caminho de %d e indo para %d\n",id1,v->id_viz);
 		if(v->id_viz == id2)
 		{
-			caminho = junta_resultado(caminho, id1); //a funÃ§Ã£o evita repetiÃ§Ãµes do mesmo nÃ³ 
-			caminho = junta_resultado(caminho, id2); //na explicitaÃ§Ã£o do caminho
+			caminho = junta_resultado(caminho, id1); //a função evita repetições do mesmo nó 
+			caminho = junta_resultado(caminho, id2); //na explicitação do caminho
 		}
 		else
 		{
 			if(!digito_em_comum(caminho, v->id_viz))
-			{	  //se certificando de nÃ£o entrar em um loop infinito
-				int teste = digito_em_comum(caminho, id1);  //se certificando do caminho nÃ£o ter duas vezes o mesmo nÃ³
+			{	  //se certificando de não entrar em um loop infinito
+				int teste = digito_em_comum(caminho, id1);  //se certificando do caminho não ter duas vezes o mesmo nó
 
 				int novo_caminho = 0;
 
@@ -767,7 +772,7 @@ int sair_chegar(TG *g, int id1, int id2, int caminho)
 					novo_caminho = caminho * 10 + id1;
 				}
 
-				int temp = sair_chegar(g, v->id_viz, id2, novo_caminho); //pega o resultado, se for 0 nÃ£o existe caminho ate id2 
+				int temp = sair_chegar(g, v->id_viz, id2, novo_caminho); //pega o resultado, se for 0 não existe caminho ate id2 
 
 				if(temp)
 				{											//partindo deste v
@@ -780,87 +785,111 @@ int sair_chegar(TG *g, int id1, int id2, int caminho)
 	}
 
 	if(!digito_em_comum(caminho, id1))
-		return 0; // se nÃ£o possui vertice ou nenhum dos vertices o leva ao destino, retorna 0
+		return 0; // se não possui vertice ou nenhum dos vertices o leva ao destino, retorna 0
 
 	return caminho;
 }
 int fortemente_conexos(TG *g)
 {
-	int* resp = (int*)malloc(sizeof(int));
-	resp[0] = 0;
+	int* resp = (int*)malloc(sizeof(int) * g->V);
 
-	int i = 1;
+	/* Função para incializar todo o vetor para zero */
+	memset(resp, 0, sizeof(int) * g->V);
+
+	int i = 0;
 
 	TNo *no = g->prim_no;
-
-	while(no)
-	{
+	while(no){
 		int no_chegou_em_si_mesmo = sair_chegar(g, no->id_no, no->id_no, 0);  //se certifica que existe uma resposta
-
-		if(no_chegou_em_si_mesmo)
-		{
-			int j = 1;
-
-			while(j <= i)
-			{
-				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j - 1]))
-				{
+		if(no_chegou_em_si_mesmo && ((no_chegou_em_si_mesmo / 10) % 100 != 0)){
+			int j = 0;
+			while(j <= i){
+				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j])){
 					break;
 				}
-
 				j++;
 			}
 
-			resp = (int*)realloc(resp, sizeof(int) * j);
-
-			resp[j - 1] = junta_resultado(resp[j - 1], sair_chegar(g, no->id_no, no->id_no, 0));
+			resp[j] = junta_resultado(resp[j], sair_chegar(g, no->id_no, no->id_no, 0));
 
 			if(j > i)
 			{
 				i++;
+
 			}
 		}
-
 		no = no->prox_no;
+
 	}
-
-	if(!directed(g) && (i == 1))
-	{
-		printf("O grafo nao eh orientado e eh conectado!");
-		free(resp);
-
-		/* retorna 1 (devem ser chamadas as outras funÃ§Ãµes) */
-		return 1;
-	}
-
-	if(directed(g))
-		printf("O grafo eh orientado!\nOs componentes fortemente conexos sao:\n");
-	else
-		printf("O grafo nao eh orientado e nao eh conectado! \nOs componentes conectados sao:\n");
+	printf("- Componentes fortemente conexos:\n");
 
 	if(!i)
 		printf("\tNenhum\n");
-
 	int j = 1;
+	while(j <= i){
+		printf("%d\n", resp[j]);
+		j++;
+	}
+	free(resp);
+	return 0; //restorna 0 pois nenhuma outra função precisa ser chamada
+}
 
-	while(j <= i)
+int conexo(TG *g)
+{
+	int* resp = (int*)malloc(sizeof(int) * g->V);
+
+	/* Função para incializar todo o vetor para zero */
+	memset(resp, 0, sizeof(int) * g->V);
+
+	int i = 0;
+
+	TNo *no = g->prim_no;
+	while(no){
+		int no_chegou_em_si_mesmo = sair_chegar(g, no->id_no, no->id_no, 0);  //se certifica que existe uma resposta
+
+		if(no_chegou_em_si_mesmo){
+			int j = 0;
+			while(j <= i){
+				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j])){
+					printf("digito_em_comum\n");
+					break;
+				}
+				j++;
+			}
+
+			resp[j] = junta_resultado(resp[j], sair_chegar(g, no->id_no, no->id_no, 0));
+
+			if(j > i){
+				i++;
+			}
+		}
+		no = no->prox_no;
+
+	}
+	if(i == 1)
 	{
+		free(resp);
+		return 1;                                        //retorna 1 (devem ser chamadas as outras funções)
+	}
+
+
+	printf("O grafo não é orientado e não é conectado! \nOs componentes conectados são:\n");
+	if(!i) printf("\tNenhum\n");
+	int j = 1;
+	while(j <= i){
 		printf("%d\n", resp[j]);
 		j++;
 	}
 
 	free(resp);
+	return 0; //restorna 0 pois nenhuma outra função precisa ser chamada
+}
 
-	/* Retorna 0 pois nenhuma outra funÃ§Ã£o precisa ser chamada */
-	return 0;
-}
-int conexo(TG* G)
-{
-	/* IMPLEMENTAÃ‡ÃƒO */
-}
+
 int componentes_conexos(TG* G)
 {
-	/* IMPLEMENTAÃ‡ÃƒO */
+	/* IMPLEMENTAÇÃO */
+	return FALSE;
 }
 
 void information(TG* G)
@@ -869,30 +898,31 @@ void information(TG* G)
 	{
 		printf("GRAFO:\n");
 
-		/* Se esse grafo Ã© orientado ou nÃ£o. 
-		Se for orientado, informe sua(s) componente(s) fortemente conexa(s). 
-		Um grafo orientado Ã© fortemente conexo se para qualquer par (v,w) de seus vÃ©rtices existe um caminho de v a w e tambÃ©m um caminho de w para v.
+		/* Se esse grafo é orientado ou não.
+		Se for orientado, informe sua(s) componente(s) fortemente conexa(s).
+		Um grafo orientado é fortemente conexo se para qualquer par (v,w) de seus vértices existe um caminho de v a w e também um caminho de w para v.
 		*/
 		if(directed(G))
 		{
 			printf("- Orientado\n");
 			fortemente_conexos(G);
 		}
-		/* Se esse grafo nÃ£o for orientado, verifique se ele Ã© conexo.*/
+		/* Se esse grafo não for orientado, verifique se ele é conexo.*/
 		else
 		{
 			printf("- Nao Orientado\n");
-			
-			/*	Se for conectado, indique as pontes (ponte Ã© uma aresta cuja a remoÃ§Ã£o desconecta o grafo) e os pontos de articulaÃ§Ã£o 
-			(um ponto de articulaÃ§Ã£o Ã© um vÃ©rtice de um grafo tal que a remoÃ§Ã£o desse vÃ©rtice provoca um aumento no nÃºmero de componentes conectados) existentes no grafo.
+
+			/*	Se for conectado, indique as pontes (ponte é uma aresta cuja a remoção desconecta o grafo) e os pontos de articulação
+			(um ponto de articulação é um vértice de um grafo tal que a remoção desse vértice provoca um aumento no número de componentes conectados) existentes no grafo.
 			*/
 			if(conexo(G))
 			{
-				achaPontes(G);
-				achaArticulacao(G);
+				// Funções atualmente dando problema
+				//achaPontes(G);
+				//achaArticulacao(G);
 			}
 			/*
-				Se nÃ£o for conectado, informe os componentes conexos desse grafo.
+			Se não for conectado, informe os componentes conexos desse grafo.
 			*/
 			else
 			{
@@ -1042,7 +1072,7 @@ int menu(TG *G)
 			printf("Parametro invalido\n");
 		}
 
-		/* Esperar o usuario pressionar alguma tecla para prosseguir para a prÃ³xima operaÃ§Ã£o */
+		/* Esperar o usuario pressionar alguma tecla para prosseguir para a próxima operação */
 		while(getchar() != '\n');
 		getchar();
 	}
@@ -1050,40 +1080,41 @@ int menu(TG *G)
 
 
 /*
-	G = (V, E)
-	Graph = (Vertex, Edges)
+G = (V, E)
+Graph = (Vertex, Edges)
 
-	*Um grafo pode ter zero arestas, mas nunca zero vertices
+*Um grafo pode ter zero arestas, mas nunca zero vertices
 
 */
 int main(int argc, char* argv[])
 {
-	/* Verifica se a quantidade de parÃ¢metros Ã© diferente de 2
+	/* Verifica se a quantidade de parâmetros é diferente de 2
 	Para funcionar precisa ser 2:
 	argv[0] = Nome do programa
-	argv[1] = Primeiro parÃ¢metro passado ( Nome do arquivo a ser aberto )
+	argv[1] = Primeiro parâmetro passado ( Nome do arquivo a ser aberto )
 	*/
-	if(argc != 2)
+	/*if(argc != 2)
 	{
 		printf("Entrada invalida\n");
 		return 1;
 	}
-
+	*/
 	/* Abre o arquivo no modo leitura (r = read) */
-	FILE * fp = fopen(argv[1], "r");
+	//FILE * fp = fopen(argv[1], "r");
+	FILE * fp = fopen("graph.txt", "r");
 
-	/* Se fp for igual a zero, significa que nÃ£o foi possÃ­vel abrir o arquivo */
+	/* Se fp for igual a zero, significa que não foi possível abrir o arquivo */
 	if(!fp)
 	{
 		printf("Falha ao abrir o arquivo %s\n", argv[1]);
 		return 1;
 	}
 
-	/* LÃª quantos vÃ©rtices hÃ¡ no grafo */
+	/* Lê quantos vértices há no grafo */
 	int V = 0;
 	fscanf(fp, "%d", &V);
 
-	/* Caso nÃ£o tenha vertices, terminar o programa */
+	/* Caso não tenha vertices, terminar o programa */
 	if(V <= 0)
 	{
 		printf("Um grafo precisa ter ao menos um vertice.\n");
@@ -1092,7 +1123,7 @@ int main(int argc, char* argv[])
 	}
 
 	/* Cria um grafo vazio */
-	TG *G = create();
+	TG *G = create(V);
 
 	/* Insere os vertices no grafo */
 	int i = 0;
@@ -1111,7 +1142,7 @@ int main(int argc, char* argv[])
 		fscanf(fp, "%d %d", &origin, &destiny);
 	}
 
-	/* Exibe o menu e sÃ³ retorna quando for para encerrar o programa */
+	/* Exibe o menu e só retorna quando for para encerrar o programa */
 	menu(G);
 
 	/* Libera os vertices e o grafo */

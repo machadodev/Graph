@@ -2,8 +2,8 @@
 #define MAIN_H
 
 
- typedef struct TViz
- {
+typedef struct TViz
+{
 	int id_viz;
 	struct TViz *prox_viz;
 
@@ -20,7 +20,8 @@ typedef struct TNo
 typedef struct grafo
 {
 	TNo *prim_no;
-	
+	int V; /* Qtd de vertices */
+
 } TG;
 
 typedef struct pilha
