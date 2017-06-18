@@ -1,11 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-/*
 
-	Equivalente a 'struct vizinho'
-
-*/
  typedef struct TViz
  {
 	int id_viz;
@@ -26,5 +22,13 @@ typedef struct grafo
 	TNo *prim_no;
 	
 } TG;
+
+typedef struct pilha
+{
+	int id;
+	struct pilha *prox;
+} TP;
+
+
 
 #endif // MAIN_H
