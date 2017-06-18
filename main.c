@@ -3,15 +3,14 @@
 #include "main.h" /* structs */
 
 
-#define TRUE 1
-#define FALSE 0
-
-void pilhaIni(TP* pilha){
+void pilhaIni(TP* pilha)
+{
 
 	pilha->prox = NULL;
 
 }
-void push(TP *pilha, int val){
+void push(TP *pilha, int val)
+{
 
 	TP *novaPilha = (TP*)malloc(sizeof(TP));
 
@@ -36,7 +35,8 @@ void push(TP *pilha, int val){
 	}
 
 }
-void insertStack(TP * pilha, int val){
+void insertStack(TP * pilha, int val)
+{
 
 	TP *p = pilha->prox;
 
@@ -51,7 +51,8 @@ void insertStack(TP * pilha, int val){
 	push(pilha, val);
 
 }
-void showStack(TP *pilha){
+void showStack(TP *pilha)
+{
 
 	TP *p = pilha->prox;
 
@@ -71,7 +72,8 @@ void showStack(TP *pilha){
 
 
 }
-void libera(TP* pilha){
+void libera(TP* pilha)
+{
 
 	TP *p = pilha->prox, *temp;
 
@@ -92,7 +94,8 @@ void libera(TP* pilha){
 	}
 
 }
-int buscaVisitado(TP *pilha, int val){
+int buscaVisitado(TP *pilha, int val)
+{
 
 	TP *p = pilha->prox;
 
@@ -104,7 +107,8 @@ int buscaVisitado(TP *pilha, int val){
 	return  p->id;
 
 }
-void insereVisitado(TP *pilha, int val){
+void insereVisitado(TP *pilha, int val)
+{
 
 	TP *p = pilha->prox;
 
@@ -117,7 +121,8 @@ void insereVisitado(TP *pilha, int val){
 	p->id = 1;
 
 }
-void caminho(TG *g, int id1, TP *pilha){
+void caminho(TG *g, int id1, TP *pilha)
+{
 
 	insereVisitado(pilha, id1);
 
@@ -140,7 +145,8 @@ void caminho(TG *g, int id1, TP *pilha){
 	}
 
 }
-int encontraCaminho(TG *g, int id1, int id2){
+int encontraCaminho(TG *g, int id1, int id2)
+{
 
 	TNo *p = g->prim_no;
 
@@ -150,7 +156,8 @@ int encontraCaminho(TG *g, int id1, int id2){
 
 	pilhaIni(pilha);
 
-	while(p){
+	while(p)
+	{
 
 		push(pilha, 0);
 
@@ -168,9 +175,11 @@ int encontraCaminho(TG *g, int id1, int id2){
 
 
 }
-int findLastId(TViz *v){
+int findLastId(TViz *v)
+{
 
-	while(v){
+	while(v)
+	{
 
 		if(!v->prox_viz)return v->id_viz;
 
@@ -181,13 +190,15 @@ int findLastId(TViz *v){
 	return 0;
 
 }
-void achaPontes(TG *g){                     //METODO SIMPLES
+void achaPontes(TG *g)
+{                     //METODO SIMPLES
 
 	TNo *p = g->prim_no;
 
 	int id1, id2, ultimo;
 
-	while(p){
+	while(p)
+	{
 
 		id1 = p->id_no;
 
@@ -195,7 +206,8 @@ void achaPontes(TG *g){                     //METODO SIMPLES
 
 		ultimo = findLastId(v);
 
-		while(v){
+		while(v)
+		{
 
 			TViz *proximo = v->prox_viz;
 
@@ -203,7 +215,8 @@ void achaPontes(TG *g){                     //METODO SIMPLES
 
 			removeEdge(g, id1, id2, 0);
 
-			if(!encontraCaminho(g, id1, id2)){
+			if(!encontraCaminho(g, id1, id2))
+			{
 
 				if(id1 < id2)
 
@@ -215,7 +228,8 @@ void achaPontes(TG *g){                     //METODO SIMPLES
 
 			v = proximo;
 
-			if(ultimo == id2)break;
+			if(ultimo == id2)
+				break;
 
 		}
 
@@ -224,7 +238,8 @@ void achaPontes(TG *g){                     //METODO SIMPLES
 	}
 
 }
-void achaArticulacao(TG *g){                     //procura e mostras as articulacoes
+void achaArticulacao(TG *g)
+{                     //procura e mostras as articulacoes
 
 	TNo *p = g->prim_no, *v1, *v2;
 
@@ -235,7 +250,8 @@ void achaArticulacao(TG *g){                     //procura e mostras as articula
 
 	pilhaIni(pilha);
 
-	while(p){
+	while(p)
+	{
 
 		id1 = p->id_no;
 
@@ -243,7 +259,8 @@ void achaArticulacao(TG *g){                     //procura e mostras as articula
 
 		ultimo = findLastId(v);
 
-		while(v){
+		while(v)
+		{
 
 			TViz *proximo = v->prox_viz;
 
@@ -251,15 +268,18 @@ void achaArticulacao(TG *g){                     //procura e mostras as articula
 
 			removeEdge(g, id1, id2, 0);
 
-			if(!encontraCaminho(g, id1, id2)){
+			if(!encontraCaminho(g, id1, id2))
+			{
 
 				v1 = findVertex(g, id1);
 
 				v2 = findVertex(g, id2);
 
-				if(v1->prim_viz)insertStack(pilha, id1);
+				if(v1->prim_viz)
+					insertStack(pilha, id1);
 
-				if(v2->prim_viz)insertStack(pilha, id2);
+				if(v2->prim_viz)
+					insertStack(pilha, id2);
 
 			}
 
@@ -267,7 +287,8 @@ void achaArticulacao(TG *g){                     //procura e mostras as articula
 
 			v = proximo;
 
-			if(ultimo == id2)break;
+			if(ultimo == id2)
+				break;
 
 		}
 
@@ -321,7 +342,12 @@ void release(TG *g)
 	}
 }
 
-/* Encontra um vertice no grafo */
+/* Encontra um vertice no grafo
+	
+	Return:
+	Retorna um ponteiro válido para o vertice caso exista
+	Caso não exista, retorna NULL
+ */
 TNo *findVertex(TG *g, int id)
 {
 	TNo *p = g->prim_no;
@@ -828,13 +854,10 @@ int fortemente_conexos(TG *g)
 	/* Retorna 0 pois nenhuma outra função precisa ser chamada */
 	return 0;
 }
-/* Função Booleana */
 int conexo(TG* G)
 {
 	/* IMPLEMENTAÇÃO */
 }
-
-/* Função Booleana */
 int componentes_conexos(TG* G)
 {
 	/* IMPLEMENTAÇÃO */
