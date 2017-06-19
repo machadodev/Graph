@@ -196,7 +196,11 @@ void achaPontes(TG *g)
 
 	TNo *p = g->prim_no;
 
-	int id1, id2, ultimo;
+	int id1 = 0;
+	int id2 = 0;
+	int ultimo = 0;
+
+	printf("- PONTES:\n");
 
 	while(p)
 	{
@@ -221,7 +225,7 @@ void achaPontes(TG *g)
 
 				if(id1 < id2)
 
-					printf("(%d,%d) e ponte\n", id1, id2);
+					printf("\t(%d, %d)\n", id1, id2);
 
 			}
 
@@ -237,69 +241,6 @@ void achaPontes(TG *g)
 		p = p->prox_no;
 
 	}
-
-}
-void achaArticulacao(TG *g)
-{                     //procura e mostras as articulacoes
-
-	TNo *p = g->prim_no, *v1, *v2;
-
-	int id1, id2, ultimo;
-
-
-	TP *pilha = (TP*)malloc(sizeof(TP));
-
-	pilhaIni(pilha);
-
-	while(p)
-	{
-
-		id1 = p->id_no;
-
-		TViz *v = p->prim_viz;
-
-		ultimo = findLastId(v);
-
-		while(v)
-		{
-
-			TViz *proximo = v->prox_viz;
-
-			id2 = v->id_viz;
-
-			removeEdge(g, id1, id2, 0);
-
-			if(!encontraCaminho(g, id1, id2))
-			{
-
-				v1 = findVertex(g, id1);
-
-				v2 = findVertex(g, id2);
-
-				if(v1->prim_viz)
-					insertStack(pilha, id1);
-
-				if(v2->prim_viz)
-					insertStack(pilha, id2);
-
-			}
-
-			insertEdge(g, id1, id2, 0);
-
-			v = proximo;
-
-			if(ultimo == id2)
-				break;
-
-		}
-
-		p = p->prox_no;
-
-	}
-
-	showStack(pilha);
-
-	libera(pilha);
 
 }
 
@@ -311,6 +252,22 @@ TG* create(int V)
 	g->V = V;
 
 	return g;
+}
+
+TG *CloneGraph(TG* g)
+{
+	TG *novo = create(0);
+	TNo *p = g->prim_no;
+	while(p){
+		insertVertex(novo, p->id_no);
+		TViz *v = p->prim_viz;
+		while(v){
+			insertEdge(novo, p->id_no, v->id_viz, 0);
+			v = v->prox_viz;
+		}
+		p = p->prox_no;
+	}
+	return novo;
 }
 
 /* Libera um grafo */
@@ -668,10 +625,6 @@ void print(TG *g)
 	}
 }
 
-
-
-
-
 /*  Verifica se o grafo é orientado ou não.
 
 Return:
@@ -792,6 +745,8 @@ int sair_chegar(TG *g, int id1, int id2, int caminho)
 
 	return caminho;
 }
+
+
 int fortemente_conexos(TG *g)
 {
 	int* resp = (int*)malloc(sizeof(int) * g->V);
@@ -837,8 +792,19 @@ int fortemente_conexos(TG *g)
 	free(resp);
 	return 0; //restorna 0 pois nenhuma outra função precisa ser chamada
 }
+void mostra_conexos(int *resp)
+{
+	if(resp[1] == 0) 
+		printf("\tNenhum\n");
+	int i = 1;
+	while(resp[i] != 0){
+		printf("\t( %d )\n", resp[i]);
+		i++;
+	}
 
-int conexo(TG *g)
+	free(resp);
+}
+int* conexo(TG *g)
 {
 	int* resp = (int*)malloc(sizeof(int) * g->V);
 
@@ -854,16 +820,13 @@ int conexo(TG *g)
 		if(no_chegou_em_si_mesmo){
 			int j = 0;
 			while(j <= i){
-				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j]))
-				{
-					//printf("digito_em_comum\n");
+				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j])){
 					break;
 				}
 				j++;
 			}
 
 			resp[j] = junta_resultado(resp[j], sair_chegar(g, no->id_no, no->id_no, 0));
-
 			if(j > i){
 				i++;
 			}
@@ -874,29 +837,27 @@ int conexo(TG *g)
 	if(i == 1)
 	{
 		free(resp);
-		return 1;                                        //retorna 1 (devem ser chamadas as outras funções)
+		return NULL;                                        //retorna 1 (devem ser chamadas as outras fun?es)
 	}
 
 
-	printf("- Nao Conectado\nOs Componentes Conexos Sao:\n");
-	if(!i) printf("\tNenhum\n");
-	int j = 1;
-	while(j <= i){
-		printf("%d\n", resp[j]);
-		j++;
+
+	return resp; //restorna 0 pois nenhuma outra fun?o precisa ser chamada
+}
+void achaArticulacao(TG *g){
+	printf("\n- PONTOS DE ARTICULACAO:\n");
+	TNo *p = g->prim_no;
+	while(p){
+		TG *teste = CloneGraph(g);
+		removeVertex(teste, p->id_no);
+		if(conexo(teste) != NULL){
+			printf("\t( %d )\n", p->id_no);
+		}
+		release(teste);
+		p = p->prox_no;
 	}
 
-	free(resp);
-	return 0; //restorna 0 pois nenhuma outra função precisa ser chamada
 }
-
-
-int componentes_conexos(TG* G)
-{
-	/* IMPLEMENTAÇÃO */
-	return FALSE;
-}
-
 void information(TG* G)
 {
 	if(G)
@@ -917,16 +878,25 @@ void information(TG* G)
 		{
 			printf("- Nao Orientado\n");
 
-			/*	Se for conectado, indique as pontes (ponte é uma aresta cuja a remoção desconecta o grafo) e os pontos de articulação
-			(um ponto de articulação é um vértice de um grafo tal que a remoção desse vértice provoca um aumento no número de componentes conectados) existentes no grafo.
+			/*	Se for conectado, indique as pontes (ponte ?uma aresta cuja a remo?o desconecta o grafo) e os pontos de articula?o
+			(um ponto de articula?o ?um v?tice de um grafo tal que a remo?o desse v?tice provoca um aumento no n?mero de componentes conectados) existentes no grafo.
 			*/
-
-			if(conexo(G))
+			int* resp = conexo(G);
+			if(!resp)
 			{
-				printf("Parte do Marco\n");
-				// Funções atualmente dando problema
-				//achaPontes(G);
-				//achaArticulacao(G);
+				printf("- Grafo Conexo\n");
+				achaArticulacao(G);
+				achaPontes(G);
+				
+			}
+			else
+			{
+				/*
+				Se não for conectado, informe os componentes conexos desse grafo.
+				*/
+				printf("- Grafo Nao Conexo\n");
+				printf("- COMPONENTES CONECTADOS:\n");
+				mostra_conexos(resp);
 			}
 		}
 	}
@@ -1093,12 +1063,12 @@ int main(int argc, char* argv[])
 	argv[0] = Nome do programa
 	argv[1] = Primeiro parâmetro passado ( Nome do arquivo a ser aberto )
 	*/
-	/*if(argc != 2)
+	if(argc != 2)
 	{
-		printf("Entrada invalida\n");
-		return 1;
+	printf("Entrada invalida\n");
+	return 1;
 	}
-	*/
+
 	/* Abre o arquivo no modo leitura (r = read) */
 	FILE * fp = fopen(argv[1], "r");
 	//FILE * fp = fopen("graph.txt", "r");

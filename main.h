@@ -60,7 +60,7 @@ int digito_em_comum(int primeiro, int segundo);
 int junta_resultado(int primeiro, int segundo);
 int sair_chegar(TG *g, int id1, int id2, int caminho);
 int fortemente_conexos(TG *g);
-int conexo(TG* G);
+int* conexo(TG* G);
 int componentes_conexos(TG* G);
 void information(TG* G);
 int menu(TG *G);
