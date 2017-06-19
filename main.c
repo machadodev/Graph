@@ -1,5 +1,6 @@
 #include <stdio.h> /* I/O */
 #include <stdlib.h> /* malloc */
+#include <string.h> /* memset */
 #include "main.h" /* structs */
 
 
@@ -18,8 +19,7 @@ void push(TP *pilha, int val)
 
 	novaPilha->prox = NULL;
 
-	if(pilha->prox == NULL)
-		pilha->prox = novaPilha;
+	if(pilha->prox == NULL)pilha->prox = novaPilha;
 
 	else{
 
@@ -631,9 +631,9 @@ int removeEdge(TG *G, int id1, int id2, int isDirected)
 		if(flag)
 		{
 			/* Caso o grafo seja orientado, remover a volta também */
-			if(isDirected)
+			if(!isDirected)
 			{
-				return removeEdge(G, id2, id1, 0);
+				return removeEdge(G, id2, id1, 1);
 			}
 
 			return TRUE;
@@ -784,6 +784,9 @@ int sair_chegar(TG *g, int id1, int id2, int caminho)
 		v = v->prox_viz;
 	}
 
+	if(!caminho && id1 == id2)
+		return id1;
+
 	if(!digito_em_comum(caminho, id1))
 		return 0; // se não possui vertice ou nenhum dos vertices o leva ao destino, retorna 0
 
@@ -822,9 +825,10 @@ int fortemente_conexos(TG *g)
 
 	}
 	printf("- Componentes fortemente conexos:\n");
+	printf("\t");
 
 	if(!i)
-		printf("\tNenhum\n");
+		printf("Nenhum\n");
 	int j = 1;
 	while(j <= i){
 		printf("%d\n", resp[j]);
@@ -850,8 +854,9 @@ int conexo(TG *g)
 		if(no_chegou_em_si_mesmo){
 			int j = 0;
 			while(j <= i){
-				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j])){
-					printf("digito_em_comum\n");
+				if(digito_em_comum(no_chegou_em_si_mesmo, resp[j]))
+				{
+					//printf("digito_em_comum\n");
 					break;
 				}
 				j++;
@@ -873,7 +878,7 @@ int conexo(TG *g)
 	}
 
 
-	printf("O grafo não é orientado e não é conectado! \nOs componentes conectados são:\n");
+	printf("- Nao Conectado\nOs Componentes Conexos Sao:\n");
 	if(!i) printf("\tNenhum\n");
 	int j = 1;
 	while(j <= i){
@@ -915,18 +920,13 @@ void information(TG* G)
 			/*	Se for conectado, indique as pontes (ponte é uma aresta cuja a remoção desconecta o grafo) e os pontos de articulação
 			(um ponto de articulação é um vértice de um grafo tal que a remoção desse vértice provoca um aumento no número de componentes conectados) existentes no grafo.
 			*/
+
 			if(conexo(G))
 			{
+				printf("Parte do Marco\n");
 				// Funções atualmente dando problema
 				//achaPontes(G);
 				//achaArticulacao(G);
-			}
-			/*
-			Se não for conectado, informe os componentes conexos desse grafo.
-			*/
-			else
-			{
-				componentes_conexos(G);
 			}
 		}
 	}
@@ -1100,8 +1100,8 @@ int main(int argc, char* argv[])
 	}
 	*/
 	/* Abre o arquivo no modo leitura (r = read) */
-	//FILE * fp = fopen(argv[1], "r");
-	FILE * fp = fopen("graph.txt", "r");
+	FILE * fp = fopen(argv[1], "r");
+	//FILE * fp = fopen("graph.txt", "r");
 
 	/* Se fp for igual a zero, significa que não foi possível abrir o arquivo */
 	if(!fp)
@@ -1144,6 +1144,7 @@ int main(int argc, char* argv[])
 
 	/* Exibe o menu e só retorna quando for para encerrar o programa */
 	menu(G);
+
 
 	/* Libera os vertices e o grafo */
 	release(G);
